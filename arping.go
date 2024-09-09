@@ -74,6 +74,7 @@ var (
 
 	verboseLog = log.New(ioutil.Discard, "", 0)
 	timeout    = time.Duration(500 * time.Millisecond)
+	garpOper   = uint16(requestOper)
 )
 
 // Ping sends an arp ping to 'dstIP'
@@ -202,7 +203,7 @@ func GratuitousArpOverIface(srcIP net.IP, iface net.Interface) error {
 
 	srcMac := iface.HardwareAddr
 	broadcastMac := []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	request := newArpRequest(srcMac, srcIP, broadcastMac, srcIP)
+	request := newGratuitousArp(srcMac, srcIP, broadcastMac, srcIP, garpOper)
 
 	sock, err := initialize(iface)
 	if err != nil {
@@ -222,6 +223,16 @@ func EnableVerboseLog() {
 // SetTimeout sets ping timeout
 func SetTimeout(t time.Duration) {
 	timeout = t
+}
+
+// Set gratuitous arp request
+func SetGratuitousArpRequest() {
+	garpOper = requestOper
+}
+
+// Set gratuitous arp response
+func SetGratuitousArpResponse() {
+	garpOper = responseOper
 }
 
 func validateIP(ip net.IP) error {
